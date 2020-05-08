@@ -22,6 +22,7 @@ public:
             edges[i][i] = 0;
         }
     }
+
     Graph(int size, float density, int distance_range): size(size) {
         edges = new int*[size];
 
