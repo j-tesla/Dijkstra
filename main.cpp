@@ -72,4 +72,4 @@ int main() {
 }
 
 
-// learn inheritance
+// learn inheritance in c++
