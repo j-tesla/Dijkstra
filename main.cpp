@@ -32,13 +32,13 @@ public:
         for (int i = 0; i < size; ++i) {
             for (int j = i; j < size; ++j) {
                 if (i == j) edges[i][j] = 0;
-                else edges[i][j] = edges[j][i] = (static_cast<int>(prob() < 0.19)) * (rand()%distance_range + 1) // fixit prob
+                else edges[i][j] = edges[j][i] = (static_cast<int>(/*prob()*/0 < 0.19)) * (rand()%distance_range + 1); // fixit prob
             }
         }
     }
 
-
-    int E () {                              // returns the number of edges in the graph
+    // returns the number of edges in the graph
+    int E () {
         int count = 0;
         for (int i = 0; i < size; ++i) {
             for (int j = i + 1; j < size; ++j) {
@@ -50,8 +50,42 @@ public:
         return count;
     }
 
-    int V () {                              // returns number of vertices in the graph
-        return this->size;
+    // returns number of vertices in the graph
+    int V () const {
+        return size;
+    }
+
+    // returns 0(false) if not adjacent or the distance between the nodes if adjacent
+    int get_edge (int x, int y) {
+        return edges[x][y];
+    }
+
+    // returns a vector container of nodes(int)
+    vector <int> neighbours (int x) {
+        vector <int> neighbours;
+        for (int i = 0; i < size; ++i) {
+            if(edges[x][i]) {
+                neighbours.push_back(i);
+            }
+        }
+
+        return neighbours;
+    }
+
+    // add or change edge between two nodes. no distance parameter to remove the edge
+    void set_edge (int x, int y, int distance = 0) {
+        edges[x][y] = edges[y][x] = distance;
+
+        if (distance == 0) cout << "Edge removed if existed.\n";
+    }
+
+
+
+    ~Graph () {
+        for (int i = 0; i < size; ++i) {
+            delete [] edges[i];
+        }
+        delete [] edges;
     }
 
 private:
@@ -59,10 +93,24 @@ private:
     int** edges;
     /*
      * THE MATRIX REPRESENTATION OF GRAPH:
-     *      edges[i][j] is distance between nodes i and j if directly connected or 0 if not connected directly
+     *      edges[i][j] is distance between nodes i and j if adjacent or 0 if not
      */
 
 };
+
+//
+class PriorityQueue : public Graph {                                // todo build it
+
+};
+
+//
+class ShortestPath : public Graph {                                 // todo built it too
+
+};
+
+
+
+
 
 int main() {
     std::cout << "Hello, World!" << std::endl;
