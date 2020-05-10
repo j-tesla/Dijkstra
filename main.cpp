@@ -2,7 +2,7 @@
 #include <random>
 
 using namespace std;
-/*                                                                                                      // fixit prob
+/*                                                          // fixit prob                                                        // fixit prob
 default_random_engine generator;
 uniform_real_distribution<float> distribution(0,1);
 float prob
