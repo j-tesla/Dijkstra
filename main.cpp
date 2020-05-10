@@ -33,7 +33,7 @@ public:
         for (int i = 0; i < size; ++i) {
             for (int j = i; j < size; ++j) {
                 if (i == j) edges[i][j] = 0;
-                else edges[i][j] = edges[j][i] = (static_cast<int>(/*prob()*/0 < 0.density)) * (rand()%distance_range + 1); // fixit prob
+                else edges[i][j] = edges[j][i] = (static_cast<int>(/*prob()*/0 < density)) * (rand()%distance_range + 1); // fixit prob
             }
         }
     }
