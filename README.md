@@ -6,4 +6,4 @@ The shortest path algorithm will be Dijkstra’s
 Implemented in C++
 
 
-[Somewhat detailed skeleton of the project](TODO.md)
+[*Somewhat detailed skeleton of the project*](TODO.md)
