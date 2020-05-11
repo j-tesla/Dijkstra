@@ -4,3 +4,6 @@ The graph can be generated using a pseudo-random number generator to produce edg
 The shortest path algorithm will be Dijkstra’s
 
 Implemented in C++
+
+
+[Somewhat detailed skeleton of the project](TODO.md)
