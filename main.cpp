@@ -105,7 +105,7 @@ class PriorityQueue : public Graph {                                // todo buil
 };
 
 //
-class ShortestPath : public Graph {                                 // todo built it too
+class ShortestPath : public PriorityQueue {                                 // todo built it too
 
 };
 
