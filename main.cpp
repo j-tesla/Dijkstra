@@ -125,15 +125,10 @@ public:
 //
 class PriorityQueue {                                                       // todo build it
 
-    int *harr;
-    int capacity;
-    int heap_size;
+    std::vector < int > harr;
 
 public:
-    PriorityQueue(int cap) {
-
-        harr = new int [cap];
-    }
+    PriorityQueue() = default;
 
 };
 
