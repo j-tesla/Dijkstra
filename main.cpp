@@ -29,6 +29,14 @@ double prob()
 
 class Graph {
 
+    int size;
+    int** edges;
+    /*
+     * THE MATRIX REPRESENTATION OF GRAPH:
+     *      edges[i][j] is distance between nodes i and j if adjacent or 0 if not
+     */
+
+
 public:
 
     // constructors:
@@ -121,19 +129,15 @@ public:
         delete [] edges;
     }
 
-private:
-    int size;
-    int** edges;
-    /*
-     * THE MATRIX REPRESENTATION OF GRAPH:
-     *      edges[i][j] is distance between nodes i and j if adjacent or 0 if not
-     */
 
 };
 
 //
-class PriorityQueue : public Graph {                                // todo build it
+class PriorityQueue {                                                       // todo build it
 
+    int *harr;
+    int capacity;
+    int heap_size;
 };
 
 //
