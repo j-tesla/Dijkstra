@@ -40,14 +40,18 @@ class Graph {
 public:
 
     // constructors:
-    Graph(int size): size(size) {
+    Graph(int size, float density = 0, int distance_range = 10): size(size) {
         edges = new int*[size];
 
+        srand(time(nullptr));         // seed time
         for (int i = 0; i < size; ++i) {
             edges[i] = new int[size];
         }
         for (int i = 0; i < size; ++i) {
-            edges[i][i] = 0;
+            for (int j = i; j < size; ++j) {
+                if (i == j) edges[i][j] = 0;
+                else edges[i][j] = edges[j][i] = (static_cast<int>(prob() < density)) * (getRandomNumber(1, distance_range));   // fixit prob
+            }
         }
     }
 
@@ -63,20 +67,6 @@ public:
         return os;
     }
 
-    Graph(int size, float density, int distance_range): size(size) {
-        edges = new int*[size];
-
-        srand(time(nullptr));         // seed time
-        for (int i = 0; i < size; ++i) {
-            edges[i] = new int[size];
-        }
-        for (int i = 0; i < size; ++i) {
-            for (int j = i; j < size; ++j) {
-                if (i == j) edges[i][j] = 0;
-                else edges[i][j] = edges[j][i] = (static_cast<int>(prob() < density)) * (getRandomNumber(1, distance_range));   // fixit prob
-            }
-        }
-    }
 
     // returns the number of edges in the graph
     int E () {
@@ -138,11 +128,19 @@ class PriorityQueue {                                                       // t
     int *harr;
     int capacity;
     int heap_size;
+
+public:
+    PriorityQueue(int cap) {
+
+        harr = new int [cap];
+    }
+
 };
 
 //
-class ShortestPath : public PriorityQueue {                                 // todo built it too
+class ShortestPath {                                 // todo built it too
 
+    ShortestPath() {}
 };
 
 
