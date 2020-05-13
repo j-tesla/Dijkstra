@@ -149,10 +149,10 @@ public:
     // Constructor default
     PriorityQueue () = default;
 
-    void insert (Pair pair) {
+    void QInsert (Pair pair) {
 
         pq.push_back(pair);
-        int j = pq.size() - 1;
+        unsigned long j = pq.size() - 1;
         bool flag = true;
         while (flag and ((j-1)/2 >= 0)) {
             if (pq[j].value < pq[(j-1)/2].value) {
@@ -164,11 +164,12 @@ public:
         }
     }
 
-    int size () {
+    int QSize () {
         return pq.size();
     }
 
-    Pair pop() {
+    // returns and deletes the top element
+    Pair QPop() {
         Pair top(pq[0]);
         pq[0].SetPair(pq.back());
         pq.pop_back();
@@ -189,16 +190,48 @@ public:
                 } else flag = false;
             }
         }
+        return top;
+    }
+
+    Pair getElement(int i) {
+        return pq[i];
     }
 };
 
 //
-class ShortestPath {                                                                                            // todo built it too
+class ShortestPath : public Graph, public PriorityQueue {                                                                                            // todo built it too
 
+
+    //int closed_set_size;
 public:
 
-    // Constructor default
-    ShortestPath() = default;
+    // Constructor
+    ShortestPath(int size, float density, int distanceRangeMin, int distanceRangeMax) : Graph(size, density, distanceRangeMin, distanceRangeMax) {
+    }
+
+    int path_size(int start, int end) {                                                                                                             // fixit dude
+        std::vector<bool> IsInClosedSet(V(), false);
+        int ClosedSetSize = 0;
+        QInsert({start, 0});
+
+        while (ClosedSetSize < V()) {
+            Pair top = QPop();
+            if (IsInClosedSet[top.node]) continue;
+            std::vector<int> nei(neighbours(top.node));
+            for (int i : nei) {
+                if (IsInClosedSet[i] == false) {
+                    QInsert({i, get_edge(top.node, i) + top.value});
+
+                }
+            }
+            IsInClosedSet[top.node] = true;
+
+            ClosedSetSize++;
+            if (end == top.node) return top.value;
+        }
+        return -1;
+    }
+
 };
 
 
@@ -211,13 +244,20 @@ int main() {
     const int SIZE = 50;
 
     float density[2] = {0.2, 0.4};
+    ShortestPath graph0 (SIZE, density[0], 1.0, 10.0);
+    std::cout << graph0.V() << std::endl;
 
-    Graph graph0 (SIZE, density[0], 10);
+    std::cout << graph0.path_size(0, 5);
 
     //std::cout << graph0;
 
-    std::vector<bool> closed(50, false);
-    int closedsetSize = 0;
+    //std::vector<bool> closed(50, false);
+    //int closedsetSize = 0;
+
+
+    /*for (int i = 0; i < graph0.neighbours(0).size(); ++i) {
+        graph0.neighbours(0)[0];
+    }*/
 
 
     return 0;
