@@ -2,11 +2,6 @@
 #include <random>
 #include <ctime>
 
-/*                                                                                                                          // fixit prob
-default_random_engine generator;
-uniform_real_distribution<float> distribution(0,1);
-float prob
-*/
 
 namespace MyRandom
 {
@@ -14,17 +9,39 @@ namespace MyRandom
     std::mt19937_64 generator{static_cast<std::mt19937::result_type>(std::time(nullptr)) };
 }
 
-int getRandomNumber(int min, int max)
+double getRandomNumber(int min, int max)
 {
-    std::uniform_int_distribution <int> die ( min, max ); // we can create a distribution in any function that needs it
+    std::uniform_real_distribution <double> die ( min, max ); // we can create a distribution in any function that needs it
     return die(MyRandom::generator); // and then generate a random number from our global generator
 }
 
-double prob()
-{
-    std::uniform_real_distribution <double> prob( 0.0, 1.0 );
-    return prob(MyRandom::generator);
+
+class Pair {
+public:
+    int node;
+    int value;
+
+    Pair(const int node, const int value) : node(node), value(value) {}
+
+    //Copy constructor default
+    Pair(const Pair &pair) = default;
+
+    void SetPair(const Pair &pair) {
+        node = pair.node;
+        value = pair.value;
+    }
+
+
+
+};
+
+void SwapPairs(Pair &a, Pair &b) {
+    Pair temp(a);
+    a.SetPair(b);
+    b.SetPair(temp);
+
 }
+
 
 
 class Graph {
@@ -40,21 +57,21 @@ class Graph {
 public:
 
     // constructors:
-    Graph(int size, float density = 0, int distance_range = 10): size(size) {
+    explicit Graph(int size, float density = 0, int distance_range_min = 1.0, int distance_range_max = 10.0): size(size) {
         edges = new int*[size];
 
-        srand(time(nullptr));         // seed time
         for (int i = 0; i < size; ++i) {
             edges[i] = new int[size];
         }
         for (int i = 0; i < size; ++i) {
             for (int j = i; j < size; ++j) {
                 if (i == j) edges[i][j] = 0;
-                else edges[i][j] = edges[j][i] = (static_cast<int>(prob() < density)) * (getRandomNumber(1, distance_range));   // fixit prob
+                else edges[i][j] = edges[j][i] = (static_cast<int >(getRandomNumber(0.0, 1.0) < density)) * (getRandomNumber(distance_range_min, distance_range_max));
             }
         }
     }
 
+    // printing graph << operator overloading
     friend std::ostream &operator<<(std::ostream &os, const Graph &graph) {
         for (int i = 0; i < graph.size; ++i) {
             for (int j = 0; j < graph.size; ++j) {
@@ -125,17 +142,63 @@ public:
 //
 class PriorityQueue {                                                       // todo build it
 
-    std::vector < int > harr;
+    std::vector <Pair> pq;
 
 public:
-    PriorityQueue() = default;
 
+    // Constructor default
+    PriorityQueue () = default;
+
+    void insert (Pair pair) {
+
+        pq.push_back(pair);
+        int j = pq.size() - 1;
+        bool flag = true;
+        while (flag and ((j-1)/2 >= 0)) {
+            if (pq[j].value < pq[(j-1)/2].value) {
+                SwapPairs(pq[j], pq[(j-1)/2]);
+                j = (j-1)/2;
+            } else {
+                flag = false;
+            }
+        }
+    }
+
+    int size () {
+        return pq.size();
+    }
+
+    Pair pop() {
+        Pair top(pq[0]);
+        pq[0].SetPair(pq.back());
+        pq.pop_back();
+
+        int j = 0;
+        bool flag = true;
+
+        while ( flag and (2*j + 2 <= pq.size() - 1) ) {
+            if( pq[2*j + 1].value > pq[2*j + 2].value) {                                                        // todo work in progress
+                if (pq[j].value < pq[2*j +2].value) {
+                    SwapPairs(pq[j], pq[2*j + 2]);
+                    j = 2*j + 2;
+                } else flag = false;
+            } else {
+                if (pq[j].value < pq[2*j +1].value) {
+                    SwapPairs(pq[j], pq[2*j + 1]);
+                    j = 2*j + 1;
+                } else flag = false;
+            }
+        }
+    }
 };
 
 //
-class ShortestPath {                                                       // todo built it too
+class ShortestPath {                                                                                            // todo built it too
 
-    ShortestPath() {}
+public:
+
+    // Constructor default
+    ShortestPath() = default;
 };
 
 
@@ -145,9 +208,17 @@ class ShortestPath {                                                       // to
 int main() {
     std::cout << "Hello, World!" << std::endl;
 
-    Graph graph0 (30, 1, 9);
+    const int SIZE = 50;
 
-    std::cout << graph0;
+    float density[2] = {0.2, 0.4};
+
+    Graph graph0 (SIZE, density[0], 10);
+
+    //std::cout << graph0;
+
+    std::vector<bool> closed(50, false);
+    int closedsetSize = 0;
+
 
     return 0;
 }
