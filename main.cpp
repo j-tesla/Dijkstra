@@ -5,25 +5,27 @@
 #include <utility>
 #include <climits>
 
-
 namespace MyRandom
 {
     // Initialize our generator twister with a random seed based on the clock (once at system startup)
     std::mt19937_64 generator{static_cast<std::mt19937::result_type>(std::time(nullptr)) };
 }
 
+// random real number generation
 double getRandomNumber(double min, double max)
 {
     std::uniform_real_distribution <double> die ( min, max ); // we can create a distribution in any function that needs it
     return die(MyRandom::generator); // and then generate a random number from our global generator
 }
 
+// random integer generation
 int getRandomNumber(int min, int max)
 {
     std::uniform_int_distribution <int> die ( min, max ); // we can create a distribution in any function that needs it
     return die(MyRandom::generator); // and then generate a random number from our global generator
 }
 
+// parent class Graph
 class Graph {
 
     int size;
@@ -33,22 +35,22 @@ class Graph {
      *      edges[i][j] is distance between nodes i and j if adjacent or 0 if not
      */
 
-
 public:
 
     // constructors:
     explicit Graph(int size, float density = 0, double distance_range_min = 1.0, double distance_range_max = 10.0): size(size) {
 
-        edges = new double*[size];                                                          // allocation
+        edges = new double*[size];                                                          // dynamic allocation
 
         for (int i = 0; i < size; ++i) {
-            edges[i] = new double[size];                                                    // allocation
+            edges[i] = new double[size];                                                    // dynamic allocation
         }
 
-        std::vector <std::pair <int, int> > xy;
+        // below code for randomly selecting density fraction of edges to fill with some value
+        std::vector <std::pair <int, int> > edge_pairs;
         for (int i = 0; i < size; ++i) {
             for (int j = i+1; j < size; ++j) {
-                xy.emplace_back(i, j);
+                edge_pairs.emplace_back(i, j);
             }
         }
         int selected_size = static_cast<int >(density*size*(size -1)/2);
@@ -67,21 +69,23 @@ public:
             }
         }
 
+        // filling selected edges with some value
         for (int l = 0; l < selected_size; ++l) {
-            std::pair <int, int> edge_pair = xy[selected[l]];
+            std::pair <int, int> edge_pair = edge_pairs[selected[l]];
             double random_length = 0;
             while (random_length == 0) {
                 random_length = getRandomNumber(distance_range_min, distance_range_max);
             }
             edges[edge_pair.first][edge_pair.second] = edges[edge_pair.second][edge_pair.first] = random_length;
         }
+
+        // no loops
         for (int i = 0; i < size; ++i) {
             edges[i][i] = 0;
         }
-
     }
 
-    // printing graph << operator overloading
+    // printing graph (<< operator overloading)
     friend std::ostream &operator<<(std::ostream &os, const Graph &graph) {
         for (int i = 0; i < graph.size; ++i) {
             for (int j = 0; j < graph.size; ++j) {
@@ -93,7 +97,6 @@ public:
         }
         return os;
     }
-
 
     // returns the number of edges in the graph
     int E () {
@@ -130,15 +133,16 @@ public:
         return neighboursa;
     }
 
+    /*
     // add or change edge between two nodes. no distance parameter to remove the edge
     void set_edge (int x, int y, int distance = 0) {
         edges[x][y] = edges[y][x] = distance;
 
         if (distance == 0) std::cout << "Edge removed if existed.\n";
     }
+    */
 
-
-
+    // destructor
     ~Graph () {
         for (int i = 0; i < size; ++i) {
             delete [] edges[i];
@@ -166,6 +170,7 @@ class PriorityQueue {
     static int right(const int j) {
         return 2*j + 2;
     }
+
     // assuming the subtrees are MinHeaps incorporates the given node as the root of the tree there after
     void MinHeapify(int i) {
 
@@ -187,7 +192,6 @@ public:
     // Constructor default
     PriorityQueue () = default;
 
-
     // inserts new element in the heap
     void QInsert (std::pair <int, double > pair) {
 
@@ -199,6 +203,7 @@ public:
             j = parent(j);
         }
     }
+
     // returns size of the heap
     int QSize () {
         return pq.size();
@@ -221,10 +226,7 @@ public:
         return root;
     }
 
-    std::pair <int, double > getElement(int i) {
-        return pq[i];
-    }
-
+    // decreases the value of a node
     void QDecrease (int i, double new_value) {
 
         pq[i].second = new_value;
@@ -234,11 +236,7 @@ public:
         }
     }
 
-    void QDelete(int i) {
-        QDecrease(i, INT_MIN);
-        QPop();
-    }
-
+    // search for a node in the queue
     int QSearch(int i) {
         for (int j = 0; j < pq.size(); ++j) {
             if (pq[j].first == i) {
@@ -248,11 +246,13 @@ public:
         return -1;
     }
 
+    // returns node at i-th position in the queue
     std::pair <int, double> QElement (int i) {
         if (i < pq.size()) return pq[i];
         else return {-1, 0};
     }
 
+    // to check whether the the queue is empty
     bool QIsEmpty() {
         return pq.empty();
     }
