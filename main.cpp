@@ -269,7 +269,7 @@ public:
     ShortestPath(int size, float density, double distanceRangeMin, double distanceRangeMax) : Graph(size, density, distanceRangeMin, distanceRangeMax) {
     }
 
-    double path_size(int start, int end) {
+    double PathSize(int start, int end) {
         std::vector<bool> IsInClosedSet(V(), false);           // boolean values associated to with each node being in the closed set
         int ClosedSetSize = 0;
 
@@ -308,7 +308,7 @@ public:
     }
 
     // returns average distance of a given node from all other nodes
-    double avg_path(int start) {
+    double AverageDistance(int start) {
         double sum = 0;                                              // sum of distances to find the average
         std::vector<bool> IsInClosedSet(V(), false);        // boolean values associated to with each node being in the closed set
         int ClosedSetSize = 0;
