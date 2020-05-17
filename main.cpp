@@ -350,8 +350,6 @@ public:
 
 
 int main() {
-    std::cout << "Hello, World!" << std::endl;
-
     const int SIZE = 50;
 
     float density[2] = {0.2, 0.4};
