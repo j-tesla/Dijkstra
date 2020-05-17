@@ -39,10 +39,10 @@ public:
     // constructors:
     explicit Graph(int size, float density = 0, double distance_range_min = 1.0, double distance_range_max = 10.0): size(size) {
 
-        edges = new double*[size];                  // allocation
+        edges = new double*[size];                                                          // allocation
 
         for (int i = 0; i < size; ++i) {
-            edges[i] = new double[size];            // allocation
+            edges[i] = new double[size];                                                    // allocation
         }
 
         std::vector <std::pair <int, int> > xy;
@@ -109,7 +109,7 @@ public:
     }
 
     // returns number of vertices in the graph
-    int V () const {
+    [[nodiscard]] int V () const {
         return size;
     }
 
@@ -149,24 +149,24 @@ public:
 
 };
 
-//
+// MinHeap implementation of Priority queue
 class PriorityQueue {
 
     std::vector <std::pair <int, double> > pq;
 
-
+    // parent node in the binary tree
     static int parent(const int j) {
         return (j-1)/2;
     }
-
+    // left child node in the binary tree
     static int left(const int j) {
         return 2*j + 1;
     }
-
+    // right child in the heap
     static int right(const int j) {
         return 2*j + 2;
     }
-
+    // assuming the subtrees are MinHeaps incorporates the given node as the root of the tree there after
     void MinHeapify(int i) {
 
         int l = left(i);
