@@ -204,10 +204,12 @@ public:
         }
     }
 
+    /*
     // returns size of the heap
     int QSize () {
         return pq.size();
     }
+     */
 
     // returns and deletes the top element
     std::pair <int, double> QPop() {
@@ -268,21 +270,24 @@ public:
     }
 
     double path_size(int start, int end) {
-        std::vector<bool> IsInClosedSet(V(), false);
+        std::vector<bool> IsInClosedSet(V(), false);           // boolean values associated to with each node being in the closed set
         int ClosedSetSize = 0;
 
         std::pair<int, double> root;
         root.first = start;
         root.second = 0;
-        QInsert(root);
+        QInsert(root);                                                  // start the queue with first starting node
 
+        // until all the nodes go into the closed set
         while (ClosedSetSize < V() and !(QIsEmpty())) {
 
             std::pair <int, double > top = QPop();
 
             if (end == top.first) return top.second;
 
-            std::vector<int> nei = neighbours(top.first);
+            std::vector<int> nei = neighbours(top.first);              // neighbors of the top node
+
+            // adding neighbours into the open set, i.e the priority queue
             for (int & i : nei) {
                 if (IsInClosedSet[i] == false) {
 
@@ -294,32 +299,33 @@ public:
                     } else if (QElement(search_result).second > edge + top.second) {
                         QDecrease(search_result, edge + top.second);
                     }
-
                 }
             }
-            IsInClosedSet[top.first] = true;
-
+            IsInClosedSet[top.first] = true;                          // top element into the closed set
             ClosedSetSize++;
-
         }
         return -1;
     }
 
+    // returns average distance of a given node from all other nodes
     double avg_path(int start) {
-        double sum = 0;
-        std::vector<bool> IsInClosedSet(V(), false);
+        double sum = 0;                                              // sum of distances to find the average
+        std::vector<bool> IsInClosedSet(V(), false);        // boolean values associated to with each node being in the closed set
         int ClosedSetSize = 0;
 
         std::pair<int, double> root;
         root.first = start;
         root.second = 0;
-        QInsert(root);
+        QInsert(root);                                              // start the queue with first starting node
 
+        // until all the nodes go into the closed set
         while (ClosedSetSize < V() and !(QIsEmpty())) {
 
             std::pair <int, double > top = QPop();
 
-            std::vector<int> nei = neighbours(top.first);
+            std::vector<int> nei = neighbours(top.first);           // neighbours of the top node in the queue
+
+            // adding neighbours into the open set, i.e the priority queue
             for (int & i : nei) {
                 if (IsInClosedSet[i] == false) {
 
@@ -331,18 +337,15 @@ public:
                     } else if (QElement(search_result).second > edge + top.second) {
                         QDecrease(search_result, edge + top.second);
                     }
-
                 }
             }
-            IsInClosedSet[top.first] = true;
-            sum += top.second;
+
+            IsInClosedSet[top.first] = true;                       // top element into the closed set
             ClosedSetSize++;
-
+            sum += top.second;                                     // contributing to average
         }
-
         return sum/ClosedSetSize;
     }
-
 };
 
 
@@ -352,8 +355,9 @@ public:
 int main() {
     const int SIZE = 50;
 
-    float density[2] = {0.2, 0.4};
-    ShortestPath graph0 (SIZE, density[0], 1.0, 10.0); //graph1(SIZE, density[1], 1.0, 10.0);
+    float density[2] = {0.2, 0.4};                  // densities of the graphs
+    ShortestPath graph0 (SIZE, density[0], 1.0, 10.0), graph1(SIZE, density[1], 1.0, 10.0);
+
 
   return 0;
 }
