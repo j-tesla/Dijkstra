@@ -3,7 +3,6 @@
 #include <ctime>
 #include <vector>
 #include <utility>
-#include <climits>
 
 namespace MyRandom
 {
