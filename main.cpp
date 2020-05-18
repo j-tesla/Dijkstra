@@ -20,8 +20,8 @@ double getRandomNumber(double min, double max)
 // random integer generation
 int getRandomNumber(int min, int max)
 {
-    std::uniform_int_distribution <int> die ( min, max ); // we can create a distribution in any function that needs it
-    return die(MyRandom::generator); // and then generate a random number from our global generator
+    std::uniform_int_distribution <int> die ( min, max );           // we can create a distribution in any function that needs it
+    return die(MyRandom::generator);                             // and then generate a random number from our global generator
 }
 
 // parent class Graph
@@ -39,10 +39,10 @@ public:
     // constructors:
     explicit Graph(int size, float density = 0, double distance_range_min = 1.0, double distance_range_max = 10.0): size(size) {
 
-        edges = new double*[size];                                                          // dynamic allocation
+        edges = new double*[size];                                  // dynamic allocation
 
         for (int i = 0; i < size; ++i) {
-            edges[i] = new double[size];                                                    // dynamic allocation
+            edges[i] = new double[size];                            // dynamic allocation
         }
 
         // below code for randomly selecting density fraction of edges to fill with some value
@@ -269,13 +269,13 @@ public:
     }
 
     double PathSize(int start, int end) {
-        std::vector<bool> IsInClosedSet(V(), false);           // boolean values associated to with each node being in the closed set
+        std::vector<bool> IsInClosedSet(V(), false);       // boolean values associated to with each node being in the closed set
         int ClosedSetSize = 0;
 
         std::pair<int, double> root;
         root.first = start;
         root.second = 0;
-        QInsert(root);                                                  // start the queue with first starting node
+        QInsert(root);                                              // start the queue with first starting node
 
         // until all the nodes go into the closed set
         while (ClosedSetSize < V() and !(QIsEmpty())) {
@@ -284,7 +284,7 @@ public:
 
             if (end == top.first) return top.second;
 
-            std::vector<int> nei = neighbours(top.first);              // neighbors of the top node
+            std::vector<int> nei = neighbours(top.first);           // neighbors of the top node
 
             // adding neighbours into the open set, i.e the priority queue
             for (int & i : nei) {
@@ -300,7 +300,7 @@ public:
                     }
                 }
             }
-            IsInClosedSet[top.first] = true;                          // top element into the closed set
+            IsInClosedSet[top.first] = true;                        // top element into the closed set
             ClosedSetSize++;
         }
         return -1;
@@ -308,8 +308,8 @@ public:
 
     // returns average distance of a given node from all other nodes
     double AverageDistance(int start) {
-        double sum = 0;                                              // sum of distances to find the average
-        std::vector<bool> IsInClosedSet(V(), false);        // boolean values associated to with each node being in the closed set
+        double sum = 0;                                             // sum of distances to find the average
+        std::vector<bool> IsInClosedSet(V(), false);       // boolean values associated to with each node being in the closed set
         int ClosedSetSize = 0;
 
         std::pair<int, double> root;
@@ -339,9 +339,9 @@ public:
                 }
             }
 
-            IsInClosedSet[top.first] = true;                       // top element into the closed set
+            IsInClosedSet[top.first] = true;                        // top element into the closed set
             ClosedSetSize++;
-            sum += top.second;                                     // contributing to average
+            sum += top.second;                                      // contributing to average
         }
         return sum/ClosedSetSize;
     }
@@ -354,7 +354,7 @@ public:
 int main() {
     const int SIZE = 50;
 
-    float density[2] = {0.2, 0.4};                  // densities of the graphs
+    float density[2] = {0.2, 0.4};                                  // densities of the graphs
 
     // average path calculations:
     std::cout << "Average path calculations :\n";
