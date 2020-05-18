@@ -371,7 +371,7 @@ int main() {
         std::cout << graph.AverageDistance(0) << "\t\t";
     }
 
-    std::cout << "\n\nNote that the avg path lengths are alculated here bu only considering paths from the first node for simplicity.\n";
+    std::cout << "\n\nNote that the avg path lengths are calculated here by only considering paths from the first node for simplicity.\n";
 
 
   return 0;
