@@ -356,7 +356,22 @@ int main() {
     const int SIZE = 50;
 
     float density[2] = {0.2, 0.4};                  // densities of the graphs
-    ShortestPath graph0 (SIZE, density[0], 1.0, 10.0), graph1(SIZE, density[1], 1.0, 10.0);
+
+    // average path calculations:
+    std::cout << "Average path calculations :\n";
+    std::cout << "\nCase 1:\tDensity = 20%\nAverage path lengths for a few randomly generated graphs.:\n";
+    for (int i = 0; i < 10; ++i) {
+        ShortestPath graph (SIZE, density[0], 1.0, 10.0);
+        std::cout << graph.AverageDistance(0) << "\t\t";
+    }
+
+    std::cout << "\n\nCase 2:\tDensity = 40%\nAverage path lengths for a few randomly generated graphs.:\n";
+    for (int i = 0; i < 10; ++i) {
+        ShortestPath graph (SIZE, density[1], 1.0, 10.0);
+        std::cout << graph.AverageDistance(0) << "\t\t";
+    }
+
+    std::cout << "\n\nNote that the avg path lengths are alculated here bu only considering paths from the first node for simplicity.\n";
 
 
   return 0;
