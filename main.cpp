@@ -3,6 +3,8 @@
 #include <ctime>
 #include <vector>
 #include <utility>
+#include <numeric>
+#include <climits>
 
 namespace MyRandom
 {
@@ -247,6 +249,12 @@ public:
     bool QIsEmpty() {
         return pq.empty();
     }
+
+    void QReset() {
+        costs.resize(graph_size, INFINITY);
+        pq.clear();
+    }
+    ~PriorityQueue() = default;
 };
 
 //
@@ -257,11 +265,11 @@ class ShortestPath : public PriorityQueue {
 public:
 
     // Constructor
-    ShortestPath(Graph& graph) : graph(graph), PriorityQueue(graph.V()) {
+    explicit ShortestPath(Graph& graph) : graph(graph), PriorityQueue(graph.V()) {
     }
 
     double PathSize(int start, int end) {
-
+        QReset();
         std::vector<bool> IsInClosedSet(graph.V(), false);       // boolean values associated to with each node being in the closed set
         int ClosedSetSize = 0;
 
@@ -273,7 +281,6 @@ public:
             std::pair <int, double > top = QPop();
 
             if (end == top.first) {
-                PriorityQueue(graph.V());
                 return top.second;
             }
 
@@ -296,12 +303,12 @@ public:
             IsInClosedSet[top.first] = true;                        // top element into the closed set
             ClosedSetSize++;
         }
-        PriorityQueue(graph.V());
         return -1;
     }
 
     // returns average distance of a given node from all other nodes
     double AverageDistance(int start) {
+        QReset();
         double sum = 0;                                             // sum of distances to find the average
         std::vector<bool> IsInClosedSet(graph.V(), false);       // boolean values associated to with each node being in the closed set
         int ClosedSetSize = 0;
@@ -334,8 +341,11 @@ public:
             ClosedSetSize++;
             sum += top.second;                                      // contributing to average
         }
-        PriorityQueue(graph.V());
         return sum/ClosedSetSize;
+    }
+
+    auto MST() {
+
     }
 };
 
@@ -355,7 +365,9 @@ int main() {
         Graph graph (SIZE, density[0], 1.0, 10.0);
         ShortestPath obj(graph);
         std::cout << obj.AverageDistance(0) << "\t\t";
+        std::cout << obj.PathSize(1, 12) << "\t\t";
     }
+
 
     std::cout << "\n\nCase 2:\tDensity = 40%\nAverage path lengths for a few randomly generated graphs.:\n";
     for (int i = 0; i < 10; ++i) {
