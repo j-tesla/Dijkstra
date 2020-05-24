@@ -272,7 +272,10 @@ public:
 
             std::pair <int, double > top = QPop();
 
-            if (end == top.first) return top.second;
+            if (end == top.first) {
+                PriorityQueue(graph.V());
+                return top.second;
+            }
 
             std::vector<int> nei = graph.neighbours(top.first);           // neighbors of the top node
 
@@ -293,6 +296,7 @@ public:
             IsInClosedSet[top.first] = true;                        // top element into the closed set
             ClosedSetSize++;
         }
+        PriorityQueue(graph.V());
         return -1;
     }
 
@@ -330,6 +334,7 @@ public:
             ClosedSetSize++;
             sum += top.second;                                      // contributing to average
         }
+        PriorityQueue(graph.V());
         return sum/ClosedSetSize;
     }
 };
