@@ -28,22 +28,14 @@ int getRandomNumber(int min, int max)
 class Graph {
 
     int size;
-    double** edges;
-    /*
-     * THE MATRIX REPRESENTATION OF GRAPH:
-     *      edges[i][j] is distance between nodes i and j if adjacent or 0 if not
-     */
+    std::vector<double> edges;
 
 public:
 
     // constructors:
     explicit Graph(int size, float density = 0, double distance_range_min = 1.0, double distance_range_max = 10.0): size(size) {
 
-        edges = new double*[size];                                  // dynamic allocation
-
-        for (int i = 0; i < size; ++i) {
-            edges[i] = new double[size];                            // dynamic allocation
-        }
+        edges.resize(size*size);
 
         // below code for randomly selecting density fraction of edges to fill with some value
         std::vector <std::pair <int, int> > edge_pairs;
@@ -75,26 +67,13 @@ public:
             while (random_length == 0) {
                 random_length = getRandomNumber(distance_range_min, distance_range_max);
             }
-            edges[edge_pair.first][edge_pair.second] = edges[edge_pair.second][edge_pair.first] = random_length;
+            set_edge(edge_pair.first, edge_pair.second, random_length);
         }
 
         // no loops
         for (int i = 0; i < size; ++i) {
-            edges[i][i] = 0;
+            set_edge(i, i, 0);
         }
-    }
-
-    // printing graph (<< operator overloading)
-    friend std::ostream &operator<<(std::ostream &os, const Graph &graph) {
-        for (int i = 0; i < graph.size; ++i) {
-            for (int j = 0; j < graph.size; ++j) {
-
-
-                os << graph.edges[i][j] << " | ";
-            }
-            os << std::endl;
-        }
-        return os;
     }
 
     // returns the number of edges in the graph
@@ -102,7 +81,7 @@ public:
         int count = 0;
         for (int i = 0; i < size; ++i) {
             for (int j = i + 1; j < size; ++j) {
-                if (edges[i][j] > 0) {
+                if (get_edge(i, j) > 0) {
                     count++;
                 }
             }
@@ -111,20 +90,25 @@ public:
     }
 
     // returns number of vertices in the graph
-    [[nodiscard]] int V () const {
+    int V () const {
         return size;
     }
 
     // returns 0(false) if not adjacent or the distance between the nodes if adjacent
-    double get_edge (int x, int y) {
-        return edges[x][y];
+    double get_edge (const int x, const int y) {
+        return edges[x*size +y];
+    }
+
+    // sets cost of edge (0 if the edge is absent)
+    void set_edge (const int x, const int y, const double cost) {
+        edges[x*size + y] = edges[y*size + x] = cost;
     }
 
     // returns a vector container of nodes(int)
-    std::vector <int> neighbours (int x) {
+    std::vector <int> neighbours (const int x) {
         std::vector <int> neighboursa;
         for (int i = 0; i < size; ++i) {
-            if(edges[x][i]) {
+            if(static_cast<bool>(get_edge(x, i))) {
                 neighboursa.push_back(i);
             }
         }
@@ -142,15 +126,20 @@ public:
     */
 
     // destructor
-    ~Graph () {
-        for (int i = 0; i < size; ++i) {
-            delete [] edges[i];
-        }
-        delete [] edges;
-    }
-
+    ~Graph () = default;
 
 };
+
+// printing graph (<< operator overloading)
+std::ostream &operator<<(std::ostream& os, Graph& graph) {
+    os << graph.V() << std::endl;
+    for (int i = 0; i < graph.V(); ++i) {
+        for (int j = 0; j < graph.V(); ++j) {
+            if (i != j) os << i << ' ' << j << ' '  << graph.get_edge(i, j);
+        }
+    }
+    return os;
+}
 
 // MinHeap implementation of Priority queue
 class PriorityQueue {
@@ -260,38 +249,37 @@ public:
 };
 
 //
-class ShortestPath : public Graph, public PriorityQueue {
+class ShortestPath : public PriorityQueue {
+
+    Graph graph;
 
 public:
 
     // Constructor
-    ShortestPath(int size, float density, double distanceRangeMin, double distanceRangeMax) : Graph(size, density, distanceRangeMin, distanceRangeMax) {
+    ShortestPath(Graph& graph) : graph(graph) {
     }
 
     double PathSize(int start, int end) {
-        std::vector<bool> IsInClosedSet(V(), false);       // boolean values associated to with each node being in the closed set
+        std::vector<bool> IsInClosedSet(graph.V(), false);       // boolean values associated to with each node being in the closed set
         int ClosedSetSize = 0;
 
-        std::pair<int, double> root;
-        root.first = start;
-        root.second = 0;
-        QInsert(root);                                              // start the queue with first starting node
+        QInsert({start, 0});                                              // start the queue with first starting node
 
         // until all the nodes go into the closed set
-        while (ClosedSetSize < V() and !(QIsEmpty())) {
+        while (ClosedSetSize < graph.V() and !(QIsEmpty())) {
 
             std::pair <int, double > top = QPop();
 
             if (end == top.first) return top.second;
 
-            std::vector<int> nei = neighbours(top.first);           // neighbors of the top node
+            std::vector<int> nei = graph.neighbours(top.first);           // neighbors of the top node
 
             // adding neighbours into the open set, i.e the priority queue
             for (int & i : nei) {
                 if (IsInClosedSet[i] == false) {
 
                     int search_result = QSearch(i);
-                    double edge = get_edge(top.first, i);
+                    double edge = graph.get_edge(top.first, i);
 
                     if (search_result == -1) {
                         QInsert({i, edge + top.second});
@@ -309,7 +297,7 @@ public:
     // returns average distance of a given node from all other nodes
     double AverageDistance(int start) {
         double sum = 0;                                             // sum of distances to find the average
-        std::vector<bool> IsInClosedSet(V(), false);       // boolean values associated to with each node being in the closed set
+        std::vector<bool> IsInClosedSet(graph.V(), false);       // boolean values associated to with each node being in the closed set
         int ClosedSetSize = 0;
 
         std::pair<int, double> root;
@@ -318,18 +306,18 @@ public:
         QInsert(root);                                              // start the queue with first starting node
 
         // until all the nodes go into the closed set
-        while (ClosedSetSize < V() and !(QIsEmpty())) {
+        while (ClosedSetSize < graph.V() and !(QIsEmpty())) {
 
             std::pair <int, double > top = QPop();
 
-            std::vector<int> nei = neighbours(top.first);           // neighbours of the top node in the queue
+            std::vector<int> nei = graph.neighbours(top.first);           // neighbours of the top node in the queue
 
             // adding neighbours into the open set, i.e the priority queue
             for (int & i : nei) {
                 if (IsInClosedSet[i] == false) {
 
                     int search_result = QSearch(i);
-                    double edge = get_edge(top.first, i);
+                    double edge = graph.get_edge(top.first, i);
 
                     if (search_result == -1) {
                         QInsert({i, edge + top.second});
@@ -360,14 +348,16 @@ int main() {
     std::cout << "Average path calculations :\n";
     std::cout << "\nCase 1:\tDensity = 20%\nAverage path lengths for a few randomly generated graphs.:\n";
     for (int i = 0; i < 10; ++i) {
-        ShortestPath graph (SIZE, density[0], 1.0, 10.0);
-        std::cout << graph.AverageDistance(0) << "\t\t";
+        Graph graph (SIZE, density[0], 1.0, 10.0);
+        ShortestPath obj(graph);
+        std::cout << obj.AverageDistance(0) << "\t\t";
     }
 
     std::cout << "\n\nCase 2:\tDensity = 40%\nAverage path lengths for a few randomly generated graphs.:\n";
     for (int i = 0; i < 10; ++i) {
-        ShortestPath graph (SIZE, density[1], 1.0, 10.0);
-        std::cout << graph.AverageDistance(0) << "\t\t";
+        Graph graph (SIZE, density[1], 1.0, 10.0);
+        ShortestPath obj(graph);
+        std::cout << obj.AverageDistance(0) << "\t\t";
     }
 
     std::cout << "\n\nNote that the avg path lengths are calculated here by only considering paths from the first node for simplicity.\n";
