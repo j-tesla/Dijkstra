@@ -5,6 +5,7 @@
 #include <utility>
 #include <numeric>
 #include <climits>
+#include <fstream>
 
 namespace MyRandom
 {
@@ -35,6 +36,17 @@ class Graph {
 public:
 
     // constructors:
+    explicit Graph(std::ifstream& in) : size(0){
+
+        in >> size;
+        edges.resize(size*size);
+
+        int i, j, edge;
+        while (in >> i) {
+            in >> j >> edge;
+            set_edge(i, j, edge);
+        }
+    }
     explicit Graph(int size, float density = 0, double distance_range_min = 1.0, double distance_range_max = 10.0): size(size) {
 
         edges.resize(size*size);
@@ -137,7 +149,7 @@ std::ostream &operator<<(std::ostream& os, Graph& graph) {
     os << graph.V() << std::endl;
     for (int i = 0; i < graph.V(); ++i) {
         for (int j = 0; j < graph.V(); ++j) {
-            if (i != j) os << i << ' ' << j << ' '  << graph.get_edge(i, j);
+            if (i != j) os << i << ' ' << j << ' '  << graph.get_edge(i, j) << std::endl;
         }
     }
     return os;
