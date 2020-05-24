@@ -144,7 +144,9 @@ std::ostream &operator<<(std::ostream& os, Graph& graph) {
 // MinHeap implementation of Priority queue
 class PriorityQueue {
 
-    std::vector <std::pair <int, double> > pq;
+    int graph_size;
+    std::vector<int> pq;
+    std::vector<double> costs;
 
     // parent node in the binary tree
     static int parent(const int j) {
@@ -165,12 +167,12 @@ class PriorityQueue {
         int l = left(i);
         int r = right(i);
         int smallest = i;
-        if (l < pq.size() and pq[l].second < pq[i].second)
+        if (l < pq.size() and costs[pq[l]] < costs[pq[i]])
             smallest = l;
-        if (r < pq.size() and pq[r].second < pq[smallest].second)
+        if (r < pq.size() and costs[pq[r]] < costs[pq[smallest]])
             smallest = r;
         if (smallest != i) {
-            swap(pq[i], pq[smallest]);
+            std::swap(pq[i], pq[smallest]);
             MinHeapify(smallest);
         }
     }
@@ -178,36 +180,35 @@ class PriorityQueue {
 public:
 
     // Constructor default
-    PriorityQueue () = default;
+    explicit PriorityQueue (int size) : graph_size(size) {
+        costs.resize(graph_size, INFINITY);
+    }
 
     // inserts new element in the heap
-    void QInsert (std::pair <int, double > pair) {
+    void QInsert (int node, double  cost) {
 
-        pq.push_back(pair);
+        pq.push_back(node);
+        costs[node] = cost;
         int j = pq.size() - 1;
 
-        while ((j != 0) and (pq[parent(j)].second > pq[j].second)) {
-            swap(pq[j], pq[parent(j)]);
+        while ((j != 0) and (costs[pq[parent(j)]] > costs[pq[j]])) {
+            std::swap(pq[j], pq[parent(j)]);
             j = parent(j);
         }
     }
 
-    /*
+
     // returns size of the heap
     int QSize () {
         return pq.size();
     }
-     */
+
 
     // returns and deletes the top element
     std::pair <int, double> QPop() {
 
-        std::pair <int, double > root = pq[0];
+        std::pair <int, double > root = {pq[0], costs[pq[0]]};
 
-        if (pq.empty()) {
-            pq.pop_back();
-            return root;
-        }
         pq[0] = pq.back();
         pq.pop_back();
 
@@ -217,19 +218,19 @@ public:
     }
 
     // decreases the value of a node
-    void QDecrease (int i, double new_value) {
+    void QDecrease (int node, double new_value) {
 
-        pq[i].second = new_value;
-        while (i != 0 and pq[parent(i)].second > pq[i].second) {
-            swap(pq[i], pq[parent(i)]);
-            i = parent(i);
+        costs[pq[node]] = new_value;
+        while (node != 0 and costs[pq[parent(node)]] > costs[pq[node]]) {
+            std::swap(pq[node], pq[parent(node)]);
+            node = parent(node);
         }
     }
 
     // search for a node in the queue
-    int QSearch(int i) {
+    int QSearch(int node) {
         for (int j = 0; j < pq.size(); ++j) {
-            if (pq[j].first == i) {
+            if (pq[j] == node) {
                 return j;
             }
         }
@@ -238,7 +239,7 @@ public:
 
     // returns node at i-th position in the queue
     std::pair <int, double> QElement (int i) {
-        if (i < pq.size()) return pq[i];
+        if (i < pq.size()) return {pq[i], costs[pq[i]]};
         else return {-1, 0};
     }
 
@@ -256,14 +257,15 @@ class ShortestPath : public PriorityQueue {
 public:
 
     // Constructor
-    ShortestPath(Graph& graph) : graph(graph) {
+    ShortestPath(Graph& graph) : graph(graph), PriorityQueue(graph.V()) {
     }
 
     double PathSize(int start, int end) {
+
         std::vector<bool> IsInClosedSet(graph.V(), false);       // boolean values associated to with each node being in the closed set
         int ClosedSetSize = 0;
 
-        QInsert({start, 0});                                              // start the queue with first starting node
+        QInsert(start, 0);                                              // start the queue with first starting node
 
         // until all the nodes go into the closed set
         while (ClosedSetSize < graph.V() and !(QIsEmpty())) {
@@ -282,7 +284,7 @@ public:
                     double edge = graph.get_edge(top.first, i);
 
                     if (search_result == -1) {
-                        QInsert({i, edge + top.second});
+                        QInsert(i, edge + top.second);
                     } else if (QElement(search_result).second > edge + top.second) {
                         QDecrease(search_result, edge + top.second);
                     }
@@ -300,10 +302,7 @@ public:
         std::vector<bool> IsInClosedSet(graph.V(), false);       // boolean values associated to with each node being in the closed set
         int ClosedSetSize = 0;
 
-        std::pair<int, double> root;
-        root.first = start;
-        root.second = 0;
-        QInsert(root);                                              // start the queue with first starting node
+        QInsert(start, 0);                                              // start the queue with first starting node
 
         // until all the nodes go into the closed set
         while (ClosedSetSize < graph.V() and !(QIsEmpty())) {
@@ -320,7 +319,7 @@ public:
                     double edge = graph.get_edge(top.first, i);
 
                     if (search_result == -1) {
-                        QInsert({i, edge + top.second});
+                        QInsert(i, edge + top.second);
                     } else if (QElement(search_result).second > edge + top.second) {
                         QDecrease(search_result, edge + top.second);
                     }
