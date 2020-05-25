@@ -50,6 +50,8 @@ Finally, the class: ShortestPathAlgo - implements the mechanics of Dijkstra’s 
 +    vertices(List): list of vertices in G(V,E).
 +    path(u, w): find shortest path between u-w and returns the sequence of vertices representing shorest path u-v1-v2-…-vn-w.
 +    PathSize(u, w): return the path cost associated with the shortest path.
++    AveragePath(u): return the average distance from the node u to all other nodes
++    primMST(): return a minimum spanning tree of the graph
 
 The class implementing your Monte Carlo simulation is the workflow manager for this assignment, but other helper classes may be necessary depending on your particular implementation
 
