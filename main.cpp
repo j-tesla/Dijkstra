@@ -6,6 +6,7 @@
 #include <numeric>
 #include <climits>
 #include <fstream>
+#include <tuple>
 
 namespace MyRandom
 {
@@ -46,7 +47,13 @@ public:
             in >> j >> edge;
             set_edge(i, j, edge);
         }
+
+        // no loops
+        for (int i = 0; i < size; ++i) {
+            set_edge(i, i, 0);
+        }
     }
+
     explicit Graph(int size, float density = 0, double distance_range_min = 1.0, double distance_range_max = 10.0): size(size) {
 
         edges.resize(size*size);
@@ -129,15 +136,6 @@ public:
 
         return neighboursa;
     }
-
-    /*
-    // add or change edge between two nodes. no distance parameter to remove the edge
-    void set_edge (int x, int y, int distance = 0) {
-        edges[x][y] = edges[y][x] = distance;
-
-        if (distance == 0) std::cout << "Edge removed if existed.\n";
-    }
-    */
 
     // destructor
     ~Graph () = default;
@@ -356,7 +354,51 @@ public:
         return sum/ClosedSetSize;
     }
 
-    auto MST() {
+    std::pair<double, std::vector<std::pair<int, int> > > primMST() {
+        QReset();
+        double TotalCost = 0;
+        std::vector<bool> IsInClosedSet(graph.V(), false);
+        int ClosedSetSize = 0;
+        std::vector<std::pair<int, int> > TheEdges;
+        std::vector<int> prevNode(graph.V());
+
+        QInsert(0, 0);
+
+        // until all the nodes go into the closed set
+        while (ClosedSetSize < graph.V()) {
+
+            if (QIsEmpty()) return {-1, TheEdges};
+
+            std::pair<int, double> top = QPop();
+
+            std::vector<int> nei = graph.neighbours(top.first);           // neighbors of the top node
+
+            // adding neighbours into the open set, i.e the priority queue
+            for (int & i : nei) {
+                if (IsInClosedSet[i] == false) {
+
+                    int search_result = QSearch(i);
+                    double edge = graph.get_edge(top.first, i);
+
+                    if (search_result == -1) {
+                        prevNode[i] = top.first;
+                        QInsert(i, edge + top.second);
+                    } else if (QElement(search_result).second > edge + top.second) {
+                        prevNode[i] = top.first;
+                        QDecrease(search_result, edge + top.second);
+                    }
+                }
+            }
+
+            IsInClosedSet[top.first] = true;                        // top element into the closed set
+            ClosedSetSize++;
+            if (0 != top.first) {
+                TotalCost += graph.get_edge(prevNode[top.first], top.first);
+                TheEdges.emplace_back(prevNode[top.first], top.first);
+            }
+
+        }
+        return {TotalCost, TheEdges};
 
     }
 };
@@ -369,7 +411,7 @@ int main() {
     const int SIZE = 50;
 
     float density[2] = {0.2, 0.4};                                  // densities of the graphs
-
+/*
     // average path calculations:
     std::cout << "Average path calculations :\n";
     std::cout << "\nCase 1:\tDensity = 20%\nAverage path lengths for a few randomly generated graphs.:\n";
@@ -389,7 +431,17 @@ int main() {
     }
 
     std::cout << "\n\nNote that the avg path lengths are calculated here by only considering paths from the first node for simplicity.\n";
-
+*/
+    //Graph graph(SIZE, density[0], 1.0, 5.0);
+    std::ifstream in("g1.txt");
+    Graph graph(in);
+    ShortestPath obj(graph);
+    auto x = obj.primMST();
+    std::cout << "cost :\t" << x.first << std::endl;
+    for (std::pair<int, int> es : x.second) {
+        std::cout << es.first << '\t' << es.second << std::endl;
+    }
+    std::cout << "count:\t" << x.second.size();
 
   return 0;
 }
