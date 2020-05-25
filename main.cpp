@@ -1,10 +1,12 @@
+// Author: Jayanth PSY
+// contents: Implementation of Dijkstra's Algorithm and Prim's Minimum Spanning Tree
+// classes defined: Graph, PriorityQueue (MinHeap implementation), ShortestPath (contains the algorithm)
+
 #include <iostream>
 #include <random>
 #include <ctime>
 #include <vector>
 #include <utility>
-#include <numeric>
-#include <climits>
 #include <fstream>
 #include <tuple>
 
@@ -354,13 +356,16 @@ public:
         return sum/ClosedSetSize;
     }
 
+    // Prim's Minimum Spanning Tree:
+    // returns a pair containing the cost of the tree and a vector containing all the edges in the form of pairs of nodes
     std::pair<double, std::vector<std::pair<int, int> > > primMST() {
         QReset();
         double TotalCost = 0;
         std::vector<bool> IsInClosedSet(graph.V(), false);
         int ClosedSetSize = 0;
         std::vector<std::pair<int, int> > TheEdges;
-        std::vector<int> prevNode(graph.V());
+        std::vector<int> prevNode(graph.V());                       // when started traversing the minimum panning tree from node 0(in this implementation,
+                                                                       // the node just before the given is given by preNode[given_node]
 
         QInsert(0, 0);
 
@@ -390,7 +395,7 @@ public:
                 }
             }
 
-            IsInClosedSet[top.first] = true;                        // top element into the closed set
+            IsInClosedSet[top.first] = true;                          // top element into the closed set
             ClosedSetSize++;
             if (0 != top.first) {
                 TotalCost += graph.get_edge(prevNode[top.first], top.first);
@@ -408,10 +413,11 @@ public:
 
 
 int main() {
+/*
     const int SIZE = 50;
 
     float density[2] = {0.2, 0.4};                                  // densities of the graphs
-/*
+
     // average path calculations:
     std::cout << "Average path calculations :\n";
     std::cout << "\nCase 1:\tDensity = 20%\nAverage path lengths for a few randomly generated graphs.:\n";
@@ -432,12 +438,11 @@ int main() {
 
     std::cout << "\n\nNote that the avg path lengths are calculated here by only considering paths from the first node for simplicity.\n";
 */
-    //Graph graph(SIZE, density[0], 1.0, 5.0);
     std::ifstream in("g1.txt");
     Graph graph(in);
     ShortestPath obj(graph);
     auto x = obj.primMST();
-    std::cout << "cost :\t" << x.first << std::endl;
+    std::cout << "cost of the minimum spanning tree :\t" << x.first << "\n\n" << "edges:\n";
     for (std::pair<int, int> es : x.second) {
         std::cout << es.first << '\t' << es.second << std::endl;
     }
