@@ -375,7 +375,8 @@ public:
             if (QIsEmpty()) return {-1, TheEdges};
 
             std::pair<int, double> top = QPop();
-
+            IsInClosedSet[top.first] = true;                          // top element into the closed set
+            ClosedSetSize++;
             std::vector<int> nei = graph.neighbours(top.first);           // neighbors of the top node
 
             // adding neighbours into the open set, i.e the priority queue
@@ -387,16 +388,15 @@ public:
 
                     if (search_result == -1) {
                         prevNode[i] = top.first;
-                        QInsert(i, edge + top.second);
-                    } else if (QElement(search_result).second > edge + top.second) {
+                        QInsert(i, edge);
+                    } else if (QElement(search_result).second > edge ) {
                         prevNode[i] = top.first;
-                        QDecrease(search_result, edge + top.second);
+                        QDecrease(search_result, edge);
                     }
                 }
             }
 
-            IsInClosedSet[top.first] = true;                          // top element into the closed set
-            ClosedSetSize++;
+
             if (0 != top.first) {
                 TotalCost += graph.get_edge(prevNode[top.first], top.first);
                 TheEdges.emplace_back(prevNode[top.first], top.first);
