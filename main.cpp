@@ -129,14 +129,14 @@ public:
 
     // returns a vector container of nodes(int)
     std::vector <int> neighbours (const int x) {
-        std::vector <int> neighboursa;
+        std::vector <int> neighbours_temp;
         for (int i = 0; i < size; ++i) {
             if(static_cast<bool>(get_edge(x, i))) {
-                neighboursa.push_back(i);
+                neighbours_temp.push_back(i);
             }
         }
 
-        return neighboursa;
+        return neighbours_temp;
     }
 
     // destructor
