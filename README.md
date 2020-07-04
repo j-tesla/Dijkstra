@@ -1,5 +1,10 @@
 # cpp_Greedy
 
+
+---
+
+*(implemented class Graph, MinHeap, Dijkstra's Algorithm and Prim's minimum Spanning Tree from scratch)*
+
 ---
 ### A Monte Carlo simulation that calculates the average shortest path in a graph. 
 #### (_commented out:_)
