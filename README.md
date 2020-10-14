@@ -15,7 +15,7 @@ The shortest path algorithm will be Dijkstra’s
 ### Prim's minimum spanning tree
 
 ---
-#### Graph can ne passed as file
+#### Graph can be passed as file
 exapmle: _g1.txt_
 
 ---
